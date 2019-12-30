@@ -56,6 +56,12 @@ public class WorkHours {
 	public void setEmpId(Employee empId) {
 		this.empId = empId;
 	}
+	public int getShift() {
+		return shift;
+	}
+	public void setShift(int shift) {
+		this.shift = shift;
+	}
 
 
 	

@@ -11,7 +11,7 @@ import com.punchInOut.DTO.PunchClockData;
 
 public interface PunchClockDataRepository extends JpaRepository<PunchClockData, Long> ,CrudRepository<PunchClockData, Long> {
 
-	public List<PunchClockData> findByEmpIdAndPunchDay(Employee Id,Date punchDay);
+	public List<PunchClockData> findByEmpIdAndPunchDayAndShift(Employee Id,Date punchDay,int shift);
 	public List<PunchClockData> findByEmpId(Employee Id);
 	
 	

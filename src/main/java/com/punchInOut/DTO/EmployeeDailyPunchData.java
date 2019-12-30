@@ -42,8 +42,7 @@ public class EmployeeDailyPunchData {
     @Column(name = "punch_day")
     private Date punchDay;
     
-    @Column(name = "shift")
-    private int shift;
+
     
 	public Long getId() {
 		return id;
@@ -84,12 +83,6 @@ public class EmployeeDailyPunchData {
 	}
 	public void setPunchCount(Integer punchCount) {
 		this.punchCount = punchCount;
-	}
-	public int getShift() {
-		return shift;
-	}
-	public void setShift(int shift) {
-		this.shift = shift;
 	}
 	
 }
