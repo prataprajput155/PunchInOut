@@ -14,4 +14,5 @@ public interface EmployeeDailyPunchDataRepository extends JpaRepository<Employee
 	public EmployeeDailyPunchData findByEmpIdAndPunchDay(Employee Id,Date date);
 	
 	
+	
 }

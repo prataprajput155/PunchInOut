@@ -22,13 +22,18 @@ public class PunchInOutController {
 	PunchInOutService punchInOutService;
 	
 	@GetMapping("/{id}")
-	public void getEmployee(@PathVariable("id") Long Id) {
+	public void saveEmployeePunch(@PathVariable("id") Long Id) {
 	
       punchInOutService.savePunch(Id);
 		
 		
 	}
+	@GetMapping("/test")
+	public void getData() {
 	
+		 punchInOutService.test();
+		
+	}
    
 	
 }
