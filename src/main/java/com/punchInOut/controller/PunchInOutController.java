@@ -2,12 +2,17 @@ package com.punchInOut.controller;
 
 
 
+
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.punchInOut.DTO.EmployeeDailyPunchData;
+import com.punchInOut.DTO.PunchData;
 import com.punchInOut.repository.PunchInOutRepository;
 
 
@@ -29,11 +34,16 @@ public class PunchInOutController {
 		
 	}
 	@GetMapping("/test")
-	public void getData() {
+	public List<EmployeeDailyPunchData>  getData() {
 	
-		 punchInOutService.test();
+return	 punchInOutService.test();
 		
 	}
-   
+	@GetMapping("/get-hours")
+	public EmployeeDailyPunchData gethours(PunchData punchData) {
+	     
+		return punchInOutService.getHours(punchData);
+		
+	}
 	
 }

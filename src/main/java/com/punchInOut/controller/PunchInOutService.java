@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 import com.punchInOut.DTO.Employee;
 import com.punchInOut.DTO.EmployeeDailyPunchData;
 import com.punchInOut.DTO.PunchClockData;
+import com.punchInOut.DTO.PunchData;
 import com.punchInOut.DTO.WorkHours;
 import com.punchInOut.repository.EmployeeDailyPunchDataRepository;
 import com.punchInOut.repository.PunchClockDataRepository;
@@ -102,41 +103,41 @@ public class PunchInOutService {
 		
 	}
 	
-	public EmployeeDailyPunchData getHours(Employee emp,Date date,int shift) {
-		EmployeeDailyPunchData employeeDailyPunchData=employeeDailyPunchDataRepository.findByEmpIdAndPunchDay(emp,date);
-		List<PunchClockData> punchClockData = punchClockDataRepository.findByEmpIdAndPunchDayAndShift(emp,date,shift);
+	public EmployeeDailyPunchData getHours(PunchData punchData) {
+		SimpleDateFormat simpleDateformat = new SimpleDateFormat("E");
+		EmployeeDailyPunchData employeeDailyPunchData=employeeDailyPunchDataRepository.findByEmpIdAndPunchDay(punchData.getEmp(),punchData.getDate());
+		List<PunchClockData> punchClockData = punchClockDataRepository.findByEmpIdAndPunchDayAndShift(punchData.getEmp(),punchData.getDate(),punchData.getShift());
 		
-		if(punchClockData.size()==1) {
+		if(punchClockData.size()>1) {
 			
-			employeeDailyPunchData.setTotalWorkHours( Duration.between(LocalDateTime.ofInstant(punchClockData.get(0).getPunchTime().toInstant(), ZoneId.systemDefault()).toLocalTime(), LocalTime.now()));
+			employeeDailyPunchData.setTotalWorkHours( Duration.between(LocalDateTime.ofInstant(punchClockData.get(0).getPunchTime().toInstant(), ZoneId.systemDefault()).toLocalTime(),LocalDateTime.ofInstant(punchClockData.get(1).getPunchTime().toInstant(), ZoneId.systemDefault()).toLocalTime()));
 		}
-		else if(punchClockData.size()==2) {
-			employeeDailyPunchData.setTotalLunchHours(Duration.between(LocalDateTime.ofInstant(punchClockData.get(1).getPunchTime().toInstant(), ZoneId.systemDefault()).toLocalTime(), LocalTime.now()));
+		if(punchClockData.size()>2) {
+			employeeDailyPunchData.setTotalLunchHours(Duration.between(LocalDateTime.ofInstant(punchClockData.get(1).getPunchTime().toInstant(), ZoneId.systemDefault()).toLocalTime(), LocalDateTime.ofInstant(punchClockData.get(2).getPunchTime().toInstant(), ZoneId.systemDefault()).toLocalTime()));
 		}
-		else if(punchClockData.size()==3) {
+		if(punchClockData.size()>3) {
 
-			employeeDailyPunchData.setTotalWorkHours(employeeDailyPunchData.getTotalWorkHours().plus(Duration.between(LocalDateTime.ofInstant(punchClockData.get(2).getPunchTime().toInstant(), ZoneId.systemDefault()).toLocalTime(), LocalTime.now())));
+			employeeDailyPunchData.setTotalWorkHours(employeeDailyPunchData.getTotalWorkHours().plus(Duration.between(LocalDateTime.ofInstant(punchClockData.get(2).getPunchTime().toInstant(), ZoneId.systemDefault()).toLocalTime(),LocalDateTime.ofInstant(punchClockData.get(3).getPunchTime().toInstant(), ZoneId.systemDefault()).toLocalTime())));
 
 		}
-		
+		List<PunchClockData> clockDatas = punchClockDataRepository.findByEmpIdAndPunchDayAndShift(punchData.getEmp(),punchData.getDate(), punchData.getShift());
+		if(clockDatas.size()==3) {
+			
+			WorkHours workhours = workHoursRepository.findByEmpIdAndDayAndShift(punchData.getEmp(), simpleDateformat.format(punchData.getDate()),punchData.getShift());
+				String[] time = workhours.getTime().split("-");
+				if(employeeDailyPunchData.getTotalLunchHours().plus(employeeDailyPunchData.getTotalWorkHours()).compareTo(Duration.between(LocalTime.parse(time[0]), LocalTime.parse(time[1])))<0) {
+					Duration d= Duration.between(LocalTime.parse(time[0]), LocalTime.parse(time[1])).minus(employeeDailyPunchData.getTotalLunchHours().plus(employeeDailyPunchData.getTotalWorkHours()));
+					employeeDailyPunchData.setTotalWorkHours(employeeDailyPunchData.getTotalWorkHours().plus(d));
+				}
+				
+
+				}
+		System.out.println(employeeDailyPunchData.getTotalWorkHours().toMinutes()+" "+employeeDailyPunchData.getTotalWorkHours().toHours());
 		return employeeDailyPunchData;
 	}
 	
 	
-	public void test() {
-		List<PunchClockData> clockDatas = punchClockDataRepository.findAll();
-		List<EmployeeDailyPunchData> em = employeeDailyPunchDataRepository.findAll();
-		for (PunchClockData p : clockDatas) {
 
-			LocalTime time = LocalDateTime.ofInstant(p.getPunchTime().toInstant(), ZoneId.systemDefault())
-					.toLocalTime();
-			System.out.println(time + "here the time is");
-
-		}
-		for (EmployeeDailyPunchData e : em) {
-			System.out.println(e.getTotalWorkHours().toMinutes() + "minutes" + e.getTotalLunchHours().toMinutes());
-		}
-	}
 	
 	
 	
@@ -155,32 +156,7 @@ public class PunchInOutService {
 	
 	
 
-	@Scheduled(cron = "30 23 * * * *")
-	public void addForgotEndDayPunch() {SimpleDateFormat simpleDateformat = new SimpleDateFormat("E");
-		List<Employee> emp = punchInOutRepository.findAll();
-		for(int i=0; i<=emp.size();i++) {
-		for(int shift=1;shift<=2;shift++) {
-		List<PunchClockData> clockDatas = punchClockDataRepository.findByEmpIdAndPunchDayAndShift(emp.get(i),new Date(), shift);
-		if(clockDatas.size()==3) {
-			EmployeeDailyPunchData empDPD = employeeDailyPunchDataRepository.findByEmpIdAndPunchDay(emp.get(i), new Date());
-			
-			WorkHours workhours = workHoursRepository.findByEmpIdAndDayAndShift(emp.get(i), simpleDateformat.format(new Date()),shift);
-				String[] time = workhours.getTime().split("-");
-				if(empDPD.getTotalLunchHours().plus(empDPD.getTotalWorkHours()).compareTo(Duration.between(LocalTime.parse(time[0]), LocalTime.parse(time[1])))<0) {
-					Duration d= Duration.between(LocalTime.parse(time[0]), LocalTime.parse(time[1])).minus(empDPD.getTotalLunchHours().plus(empDPD.getTotalWorkHours()));
-					empDPD.setTotalWorkHours(empDPD.getTotalWorkHours().plus(d));
-					employeeDailyPunchDataRepository.save(empDPD);
-				}
-				
-					// clockDatas.get(3).getPunchTime()
 
-				}
-
-			}
-		}
-
-	}
-	
 	
 	
 	
