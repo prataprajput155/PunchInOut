@@ -3,7 +3,6 @@ package com.punchInOut.controller;
 
 
 
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,15 +32,12 @@ public class PunchInOutController {
 		
 		
 	}
-	@GetMapping("/test")
-	public List<EmployeeDailyPunchData>  getData() {
-	
-return	 punchInOutService.test();
-		
-	}
+
 	@GetMapping("/get-hours")
-	public EmployeeDailyPunchData gethours(PunchData punchData) {
-	     
+	public PunchData gethours(PunchData punchData) {
+	     if(punchData.getShift()==null && punchData.getDate()==null) {
+	    	 return punchInOutService.totalHours(punchData);
+	     }
 		return punchInOutService.getHours(punchData);
 		
 	}

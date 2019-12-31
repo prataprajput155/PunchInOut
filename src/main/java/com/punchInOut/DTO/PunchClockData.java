@@ -38,7 +38,7 @@ public class PunchClockData {
     private Date punchDay;
     
     @Column(name = "shift")
-    private int shift;
+    private Integer shift;
     
 	public Date getPunchDay() {
 		return punchDay;
@@ -66,12 +66,13 @@ public class PunchClockData {
 	public void setPunchTime(Date punchTime) {
 		this.punchTime = punchTime;
 	}
-	public int getShift() {
+	public Integer getShift() {
 		return shift;
 	}
-	public void setShift(int shift) {
+	public void setShift(Integer shift) {
 		this.shift = shift;
 	}
+
 
 
 

@@ -5,6 +5,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -103,11 +104,12 @@ public class PunchInOutService {
 		
 	}
 	
-	public EmployeeDailyPunchData getHours(PunchData punchData) {
+	public PunchData getHours(PunchData punchData) {
 		SimpleDateFormat simpleDateformat = new SimpleDateFormat("E");
 		EmployeeDailyPunchData employeeDailyPunchData=employeeDailyPunchDataRepository.findByEmpIdAndPunchDay(punchData.getEmp(),punchData.getDate());
 		List<PunchClockData> punchClockData = punchClockDataRepository.findByEmpIdAndPunchDayAndShift(punchData.getEmp(),punchData.getDate(),punchData.getShift());
-		
+		 PunchData totalPunchData= new PunchData();
+		 totalPunchData.setEmp(punchData.getEmp());
 		if(punchClockData.size()>1) {
 			
 			employeeDailyPunchData.setTotalWorkHours( Duration.between(LocalDateTime.ofInstant(punchClockData.get(0).getPunchTime().toInstant(), ZoneId.systemDefault()).toLocalTime(),LocalDateTime.ofInstant(punchClockData.get(1).getPunchTime().toInstant(), ZoneId.systemDefault()).toLocalTime()));
@@ -132,8 +134,14 @@ public class PunchInOutService {
 				
 
 				}
-		System.out.println(employeeDailyPunchData.getTotalWorkHours().toMinutes()+" "+employeeDailyPunchData.getTotalWorkHours().toHours());
-		return employeeDailyPunchData;
+		System.out.println("Total work duration In Minutes:"+employeeDailyPunchData.getTotalWorkHours().toMinutes()+"minutes In Hours:"+employeeDailyPunchData.getTotalWorkHours().toHours()+"hours");
+		System.out.println("Total lunch duration In Minutes"+employeeDailyPunchData.getTotalLunchHours().toMinutes()+"minutes In Hours"+employeeDailyPunchData.getTotalLunchHours().toHours()+"hours");
+		
+		 totalPunchData.setTotalWorkHours(totalPunchData.getTotalWorkHours()==null?employeeDailyPunchData.getTotalWorkHours():totalPunchData.getTotalWorkHours().plus(employeeDailyPunchData.getTotalWorkHours()));
+	      totalPunchData.setTotalLunchHours(totalPunchData.getTotalLunchHours()==null?employeeDailyPunchData.getTotalLunchHours():totalPunchData.getTotalLunchHours().plus(employeeDailyPunchData.getTotalLunchHours()));
+	
+		
+		return totalPunchData;
 	}
 	
 	
@@ -155,7 +163,22 @@ public class PunchInOutService {
 	}
 	
 	
-
+   public PunchData totalHours(PunchData punchData) {
+	   List<EmployeeDailyPunchData> employeeDailyPunchData = employeeDailyPunchDataRepository.findByEmpId(punchData.getEmp());
+	//   List<PunchClockData> punchClockData = punchClockDataRepository.findAll();
+	 PunchData totalPunchData= new PunchData();
+	 totalPunchData.setEmp(punchData.getEmp());
+	   for(EmployeeDailyPunchData e:employeeDailyPunchData) {
+		   for(int shift=1;shift<2;shift++) {
+		      punchData.setShift(shift);
+		      punchData.setDate(e.getPunchDay());
+		      PunchData empDPD= getHours(punchData);
+		      totalPunchData.setTotalWorkHours(totalPunchData.getTotalWorkHours()==null?empDPD.getTotalWorkHours():totalPunchData.getTotalWorkHours().plus(empDPD.getTotalWorkHours()));
+		      totalPunchData.setTotalLunchHours(totalPunchData.getTotalLunchHours()==null?empDPD.getTotalLunchHours():totalPunchData.getTotalLunchHours().plus(empDPD.getTotalLunchHours()));
+			}
+		}
+     return totalPunchData;
+	}
 
 	
 	
