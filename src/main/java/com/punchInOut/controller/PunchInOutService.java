@@ -171,20 +171,28 @@ public class PunchInOutService {
 	
 	public int checkShiftOfEmployee(Employee emp) {
 		SimpleDateFormat simpleDateformat = new SimpleDateFormat("E");
-		WorkHours workhours = workHoursRepository.findByEmpIdAndDayAndShift(emp, simpleDateformat.format(new Date()),
+		WorkHours workhoursSecondShift = workHoursRepository.findByEmpIdAndDayAndShift(emp, simpleDateformat.format(new Date()),
 				2);
-		if (workhours == null) {
-			return 1;
-		}
-		String[] time = workhours.getTime().split("-");
-		if (time.length != 0) {
-			if (LocalTime.now().isAfter(LocalTime.parse(time[0]))) {
-				return 2;
+		if (workhoursSecondShift.getTime().isEmpty()) {
+			WorkHours workhours = workHoursRepository.findByEmpIdAndDayAndShift(emp,
+					simpleDateformat.format(new Date()), 1);
+			if (workhours.getTime().isEmpty()) {
+				return 0;
 			} else {
 				return 1;
 			}
 		}
-		return 0;
+		else {
+			String[] time = workhoursSecondShift.getTime().split("-");
+			if (!time[0].isEmpty()) {
+				if (LocalTime.now().isAfter(LocalTime.parse(time[0]))) {
+					return 2;
+				} else {
+					return 1;
+				}
+			}
+			return 0;
+		}
 	}
 	
 	
