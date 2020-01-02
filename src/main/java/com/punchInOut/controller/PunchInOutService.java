@@ -137,7 +137,8 @@ public class PunchInOutService {
 			pd.setTotalWorkHours(pd.getTotalWorkHours()==null?temp.getTotalWorkHours():pd.getTotalWorkHours().plus(temp.getTotalWorkHours()));
 			pd.setTotalLunchHours(pd.getTotalLunchHours()==null?temp.getTotalLunchHours():pd.getTotalLunchHours().plus(temp.getTotalLunchHours()));
 
-		}}
+		}
+			}
 			return pd;
 			
 		}
