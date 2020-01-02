@@ -36,12 +36,12 @@ public class PunchInOutController {
 
 	@GetMapping("/get-hours")
 	public PunchData gethours(PunchData punchData) {
-	     if(punchData.getDate()==null) {
-	    	 return punchInOutService.getTotalHoursOfAllDays(punchData);
-	     }
-	     else {
+	   //  if(punchData.getStartDate()==null && punchData.getEndDate()==null) {
+	   // 	 return punchInOutService.getTotalHoursOfAllDays(punchData);
+	  //   }
+	   //  else {
 		return punchInOutService.getHoursOfShiftAndDay(punchData);}
 		
-	}
+//	}
 	
 }

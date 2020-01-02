@@ -91,10 +91,11 @@ public class PunchInOutService {
 		SimpleDateFormat simpleDateformat = new SimpleDateFormat("E");
 		 PunchData totalPunchData= new PunchData();
 		 totalPunchData.setEmp(punchData.getEmp());
-		 Optional<PunchClockData> punchClockDataForFirstRecord = punchClockDataRepository.findById(1L);
-		 PunchClockData punchClockDataForLastRecord  =  punchClockDataRepository.findTopByOrderByIdDesc();
-		 List<PunchClockData> punchClockData = punchClockDataRepository.findByEmpIdAndShiftAndPunchDayLessThanEqualAndPunchDayGreaterThanEqual(punchData.getEmp(), punchData.getShift(), punchData.getStartDate()==null?punchClockDataForFirstRecord.get().getPunchDay(): punchData.getStartDate(), punchData.getEndDate()==null? punchClockDataForLastRecord.getPunchDay() :punchData.getEndDate());
-		if(punchClockData.size()>1) {
+			List<PunchClockData> punchClockData = punchClockDataRepository.findByEmpIdAndPunchDayAndShift(punchData.getEmp(),punchData.getDate(),punchData.getShift());
+
+		 
+		 if(punchClockData.size()!=0) {
+		 if(punchClockData.size()>1) {
 			totalPunchData.setTotalWorkHours( Duration.between(LocalDateTime.ofInstant(punchClockData.get(0).getPunchTime().toInstant(), ZoneId.systemDefault()).toLocalTime(),LocalDateTime.ofInstant(punchClockData.get(1).getPunchTime().toInstant(), ZoneId.systemDefault()).toLocalTime()));
 		}
 		if(punchClockData.size()>2) {
@@ -107,31 +108,50 @@ public class PunchInOutService {
 		
 		if(punchClockData.size()==3) {
 			
-			WorkHours workhours = workHoursRepository.findByEmpIdAndDayAndShift(punchData.getEmp(), simpleDateformat.format(punchData.getDate()),punchData.getShift());
+			WorkHours workhours = workHoursRepository.findByEmpIdAndDayAndShift(punchData.getEmp(), simpleDateformat.format(punchClockData.get(0).getPunchDay()),punchData.getShift());
 				String[] time = workhours.getTime().split("-");
 				if(totalPunchData.getTotalLunchHours().plus(totalPunchData.getTotalWorkHours()).compareTo(Duration.between(LocalTime.parse(time[0]), LocalTime.parse(time[1])))<0) {
 					Duration d= Duration.between(LocalTime.parse(time[0]), LocalTime.parse(time[1])).minus(totalPunchData.getTotalLunchHours().plus(totalPunchData.getTotalWorkHours()));
 					totalPunchData.setTotalWorkHours(totalPunchData.getTotalWorkHours().plus(d));
 				}
 				}
+	
 	  	System.out.println("Total work duration In Minutes:"+totalPunchData.getTotalWorkHours().toMinutes()+"minutes In Hours:"+totalPunchData.getTotalWorkHours().toHours()+"hours");
 		System.out.println("Total lunch duration In Minutes"+totalPunchData.getTotalLunchHours().toMinutes()+"minutes In Hours"+totalPunchData.getTotalLunchHours().toHours()+"hours");
 		return totalPunchData;
 	}
+	else {return null;}
+	}
 	
 	public PunchData getHoursOfShiftAndDay(PunchData punchData) {
+		 Optional<PunchClockData> punchClockDataForFirstRecord = punchClockDataRepository.findById(1L);
+		 PunchClockData punchClockDataForLastRecord  =  punchClockDataRepository.findTopByOrderByIdDesc();
 		PunchData pd =  new PunchData();
 		if(punchData.getShift()!=null) {
-			return getHours(punchData);
+			
+			 List<PunchClockData> punchClockData = punchClockDataRepository.findByEmpIdAndShiftAndPunchDayLessThanEqualAndPunchDayGreaterThanEqual(punchData.getEmp(), punchData.getShift(), punchData.getEndDate()==null? punchClockDataForLastRecord.getPunchDay() :punchData.getEndDate(), punchData.getStartDate()==null?punchClockDataForFirstRecord.get().getPunchDay(): punchData.getStartDate());
+		for(PunchClockData p: punchClockData) {
+			punchData.setDate(p.getPunchDay());
+			PunchData temp=getHours(punchData);
+			if(temp!=null) {
+			pd.setTotalWorkHours(pd.getTotalWorkHours()==null?temp.getTotalWorkHours():pd.getTotalWorkHours().plus(temp.getTotalWorkHours()));
+			pd.setTotalLunchHours(pd.getTotalLunchHours()==null?temp.getTotalLunchHours():pd.getTotalLunchHours().plus(temp.getTotalLunchHours()));
+
+		}}
+			return pd;
 			
 		}
 		else {
 			for(int shift=1;shift<=2;shift++) {
 				punchData.setShift(shift);
+				 List<PunchClockData> punchClockData = punchClockDataRepository.findByEmpIdAndShiftAndPunchDayLessThanEqualAndPunchDayGreaterThanEqual(punchData.getEmp(), shift, punchData.getEndDate()==null? punchClockDataForLastRecord.getPunchDay() :punchData.getEndDate(), punchData.getStartDate()==null?punchClockDataForFirstRecord.get().getPunchDay(): punchData.getStartDate());
+				 for(PunchClockData p: punchClockData) {
+					 punchData.setDate(p.getPunchDay());
 				PunchData temp= getHours(punchData);
+				if(temp!=null) {
 				pd.setTotalWorkHours(pd.getTotalWorkHours()==null?temp.getTotalWorkHours():pd.getTotalWorkHours().plus(temp.getTotalWorkHours()));
 				pd.setTotalLunchHours(pd.getTotalLunchHours()==null?temp.getTotalLunchHours():pd.getTotalLunchHours().plus(temp.getTotalLunchHours()));
-			}
+			}}}
 			return pd; 
 		}
 		
@@ -157,7 +177,7 @@ public class PunchInOutService {
 	}
 	
 	
-   public PunchData getTotalHoursOfAllDays(PunchData punchData) {
+/*   public PunchData getTotalHoursOfAllDays(PunchData punchData) {
 	   List<EmployeeDailyPunchData> employeeDailyPunchData = employeeDailyPunchDataRepository.findByEmpId(punchData.getEmp());
 	 PunchData totalPunchData= new PunchData();
 	 totalPunchData.setEmp(punchData.getEmp());
@@ -182,7 +202,7 @@ public class PunchInOutService {
 		}
 	   System.out.println(totalPunchData.getTotalWorkHours().toMinutes()+"min");
      return totalPunchData;
-	}
+	}*/
 
 	
 	
