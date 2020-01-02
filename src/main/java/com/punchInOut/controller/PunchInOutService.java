@@ -142,70 +142,50 @@ public class PunchInOutService {
 			
 		}
 		else {
-			for(int shift=1;shift<=2;shift++) {
+			for (int shift = 1; shift <= 2; shift++) {
 				punchData.setShift(shift);
-				List<EmployeeDailyPunchData> employeeDailyPunchDatas = employeeDailyPunchDataRepository.findByEmpIdAndPunchDayLessThanEqualAndPunchDayGreaterThanEqual(punchData.getEmp(), punchData.getEndDate()==null? punchClockDataForLastRecord.getPunchDay() :punchData.getEndDate(), punchData.getStartDate()==null?punchClockDataForFirstRecord.get().getPunchDay(): punchData.getStartDate());
-				for(EmployeeDailyPunchData p: employeeDailyPunchDatas) {
-					 punchData.setDate(p.getPunchDay());
-				PunchData temp= getHours(punchData);
-				if(temp!=null) {
-				pd.setTotalWorkHours(pd.getTotalWorkHours()==null?temp.getTotalWorkHours():pd.getTotalWorkHours().plus(temp.getTotalWorkHours()));
-				pd.setTotalLunchHours(pd.getTotalLunchHours()==null?temp.getTotalLunchHours():pd.getTotalLunchHours().plus(temp.getTotalLunchHours()));
-			}}}
-			return pd; 
+				List<EmployeeDailyPunchData> employeeDailyPunchDatas = employeeDailyPunchDataRepository
+						.findByEmpIdAndPunchDayLessThanEqualAndPunchDayGreaterThanEqual(punchData.getEmp(),
+								punchData.getEndDate() == null ? punchClockDataForLastRecord.getPunchDay()
+										: punchData.getEndDate(),
+								punchData.getStartDate() == null ? punchClockDataForFirstRecord.get().getPunchDay()
+										: punchData.getStartDate());
+				for (EmployeeDailyPunchData p : employeeDailyPunchDatas) {
+					punchData.setDate(p.getPunchDay());
+					PunchData temp = getHours(punchData);
+					if (temp != null) {
+						pd.setTotalWorkHours(pd.getTotalWorkHours() == null ? temp.getTotalWorkHours()
+								: pd.getTotalWorkHours().plus(temp.getTotalWorkHours()));
+						pd.setTotalLunchHours(pd.getTotalLunchHours() == null ? temp.getTotalLunchHours()
+								: pd.getTotalLunchHours().plus(temp.getTotalLunchHours()));
+					}
+				}
+			}
+			return pd;
 		}
-		
+
 	}
 
 	
 	
 	
-	public int checkShiftOfEmployee(Employee emp){
+	public int checkShiftOfEmployee(Employee emp) {
 		SimpleDateFormat simpleDateformat = new SimpleDateFormat("E");
 		WorkHours workhours = workHoursRepository.findByEmpIdAndDayAndShift(emp, simpleDateformat.format(new Date()),
 				2);
-		if(workhours==null) {return 1;}
-		String[] time = workhours.getTime().split("-");
-		if(time.length!=0) {
-		if (LocalTime.now().isAfter(LocalTime.parse(time[0]))) {
-			return 2;
-		} else {
+		if (workhours == null) {
 			return 1;
 		}
+		String[] time = workhours.getTime().split("-");
+		if (time.length != 0) {
+			if (LocalTime.now().isAfter(LocalTime.parse(time[0]))) {
+				return 2;
+			} else {
+				return 1;
+			}
 		}
 		return 0;
 	}
-	
-	
-/*   public PunchData getTotalHoursOfAllDays(PunchData punchData) {
-	   List<EmployeeDailyPunchData> employeeDailyPunchData = employeeDailyPunchDataRepository.findByEmpId(punchData.getEmp());
-	 PunchData totalPunchData= new PunchData();
-	 totalPunchData.setEmp(punchData.getEmp());
-	   for(EmployeeDailyPunchData e:employeeDailyPunchData) {
-		   if(punchData.getShift()==null) {
-		   for(int shift=1;shift<=2;shift++) {
-		      punchData.setShift(shift);
-		      punchData.setDate(e.getPunchDay());
-		      PunchData empDPD= getHours(punchData);
-		      totalPunchData.setTotalWorkHours(totalPunchData.getTotalWorkHours()==null?empDPD.getTotalWorkHours():totalPunchData.getTotalWorkHours().plus(empDPD.getTotalWorkHours()));
-		      totalPunchData.setTotalLunchHours(totalPunchData.getTotalLunchHours()==null?empDPD.getTotalLunchHours():totalPunchData.getTotalLunchHours().plus(empDPD.getTotalLunchHours()));
-			}
-		   }
-		   else {
-			      punchData.setDate(e.getPunchDay());
-			      PunchData empDPD= getHours(punchData);
-			      totalPunchData.setShift(punchData.getShift());
-			      totalPunchData.setTotalWorkHours(totalPunchData.getTotalWorkHours()==null?empDPD.getTotalWorkHours():totalPunchData.getTotalWorkHours().plus(empDPD.getTotalWorkHours()));
-			      totalPunchData.setTotalLunchHours(totalPunchData.getTotalLunchHours()==null?empDPD.getTotalLunchHours():totalPunchData.getTotalLunchHours().plus(empDPD.getTotalLunchHours()));
-				
-		   }
-		}
-	   System.out.println(totalPunchData.getTotalWorkHours().toMinutes()+"min");
-     return totalPunchData;
-	}*/
-
-	
-	
 	
 	
 }
