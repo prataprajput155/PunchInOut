@@ -128,9 +128,9 @@ public class PunchInOutService {
 		 PunchClockData punchClockDataForLastRecord  =  punchClockDataRepository.findTopByOrderByIdDesc();
 		PunchData pd =  new PunchData();
 		if(punchData.getShift()!=null) {
+			List<EmployeeDailyPunchData> employeeDailyPunchDatas = employeeDailyPunchDataRepository.findByEmpIdAndPunchDayLessThanEqualAndPunchDayGreaterThanEqual(punchData.getEmp(), punchData.getEndDate()==null? punchClockDataForLastRecord.getPunchDay() :punchData.getEndDate(), punchData.getStartDate()==null?punchClockDataForFirstRecord.get().getPunchDay(): punchData.getStartDate());
+		for(EmployeeDailyPunchData p: employeeDailyPunchDatas) {
 			
-			 List<PunchClockData> punchClockData = punchClockDataRepository.findByEmpIdAndShiftAndPunchDayLessThanEqualAndPunchDayGreaterThanEqual(punchData.getEmp(), punchData.getShift(), punchData.getEndDate()==null? punchClockDataForLastRecord.getPunchDay() :punchData.getEndDate(), punchData.getStartDate()==null?punchClockDataForFirstRecord.get().getPunchDay(): punchData.getStartDate());
-		for(PunchClockData p: punchClockData) {
 			punchData.setDate(p.getPunchDay());
 			PunchData temp=getHours(punchData);
 			if(temp!=null) {
@@ -144,8 +144,8 @@ public class PunchInOutService {
 		else {
 			for(int shift=1;shift<=2;shift++) {
 				punchData.setShift(shift);
-				 List<PunchClockData> punchClockData = punchClockDataRepository.findByEmpIdAndShiftAndPunchDayLessThanEqualAndPunchDayGreaterThanEqual(punchData.getEmp(), shift, punchData.getEndDate()==null? punchClockDataForLastRecord.getPunchDay() :punchData.getEndDate(), punchData.getStartDate()==null?punchClockDataForFirstRecord.get().getPunchDay(): punchData.getStartDate());
-				 for(PunchClockData p: punchClockData) {
+				List<EmployeeDailyPunchData> employeeDailyPunchDatas = employeeDailyPunchDataRepository.findByEmpIdAndPunchDayLessThanEqualAndPunchDayGreaterThanEqual(punchData.getEmp(), punchData.getEndDate()==null? punchClockDataForLastRecord.getPunchDay() :punchData.getEndDate(), punchData.getStartDate()==null?punchClockDataForFirstRecord.get().getPunchDay(): punchData.getStartDate());
+				for(EmployeeDailyPunchData p: employeeDailyPunchDatas) {
 					 punchData.setDate(p.getPunchDay());
 				PunchData temp= getHours(punchData);
 				if(temp!=null) {
