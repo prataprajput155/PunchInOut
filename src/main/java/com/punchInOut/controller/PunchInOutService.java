@@ -5,13 +5,11 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.punchInOut.DTO.Employee;
@@ -52,11 +50,10 @@ public class PunchInOutService {
 			PunchClockData punchClockDataNew = new PunchClockData();
 		     empDailyPunchData=employeeDailyPunchDataRepository.findByEmpIdAndPunchDay(employee,now);
 		    List<PunchClockData> count= punchClockDataRepository.findByEmpIdAndPunchDayAndShift(employee, now, shift);
-		     
+		     if(shift!=0) {
 			if (empDailyPunchData != null) {
 				if(count.isEmpty() || count.size()<4) {
 				if (empDailyPunchData.getPunchCount() >= 1 && empDailyPunchData.getPunchCount() <8 ) {
-					//addHours(employee, empDailyPunchData,shift);
 					punchClockDataNew.setEmpId(emp.get());
 		            punchClockDataNew.setPunchDay(now);
 		            punchClockDataNew.setPunchTime(now);
@@ -79,7 +76,12 @@ public class PunchInOutService {
 	            punchClockDataRepository.save(punchClockDataNew);
 			
 			}
-			employeeDailyPunchDataRepository.save(empDailyPunchData);}
+			employeeDailyPunchDataRepository.save(empDailyPunchData);
+			}
+		     else {
+		    	 System.out.println("it's a holiday");
+		     }
+		}
 	            
 		}
 	
@@ -89,9 +91,9 @@ public class PunchInOutService {
 		SimpleDateFormat simpleDateformat = new SimpleDateFormat("E");
 		 PunchData totalPunchData= new PunchData();
 		 totalPunchData.setEmp(punchData.getEmp());
-		
-		List<PunchClockData> punchClockData = punchClockDataRepository.findByEmpIdAndPunchDayAndShift(punchData.getEmp(),punchData.getDate(),punchData.getShift());
-	
+		 Optional<PunchClockData> punchClockDataForFirstRecord = punchClockDataRepository.findById(1L);
+		 PunchClockData punchClockDataForLastRecord  =  punchClockDataRepository.findTopByOrderByIdDesc();
+		 List<PunchClockData> punchClockData = punchClockDataRepository.findByEmpIdAndShiftAndPunchDayLessThanEqualAndPunchDayGreaterThanEqual(punchData.getEmp(), punchData.getShift(), punchData.getStartDate()==null?punchClockDataForFirstRecord.get().getPunchDay(): punchData.getStartDate(), punchData.getEndDate()==null? punchClockDataForLastRecord.getPunchDay() :punchData.getEndDate());
 		if(punchClockData.size()>1) {
 			totalPunchData.setTotalWorkHours( Duration.between(LocalDateTime.ofInstant(punchClockData.get(0).getPunchTime().toInstant(), ZoneId.systemDefault()).toLocalTime(),LocalDateTime.ofInstant(punchClockData.get(1).getPunchTime().toInstant(), ZoneId.systemDefault()).toLocalTime()));
 		}
@@ -143,11 +145,14 @@ public class PunchInOutService {
 		WorkHours workhours = workHoursRepository.findByEmpIdAndDayAndShift(emp, simpleDateformat.format(new Date()),
 				2);
 		String[] time = workhours.getTime().split("-");
+		if(time.length==0) {
 		if (LocalTime.now().isAfter(LocalTime.parse(time[0]))) {
 			return 2;
 		} else {
 			return 1;
 		}
+		}
+		return 0;
 	}
 	
 	

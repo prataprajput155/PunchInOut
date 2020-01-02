@@ -13,6 +13,6 @@ public interface PunchClockDataRepository extends JpaRepository<PunchClockData, 
 
 	public List<PunchClockData> findByEmpIdAndPunchDayAndShift(Employee Id,Date punchDay,int shift);
 	public List<PunchClockData> findByEmpId(Employee Id);
-	
-	
+	public List<PunchClockData> findByEmpIdAndShiftAndPunchDayLessThanEqualAndPunchDayGreaterThanEqual(Employee Id,int shift,Date startDate,Date endDate);
+	public PunchClockData findTopByOrderByIdDesc();
 }

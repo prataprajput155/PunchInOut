@@ -12,7 +12,16 @@ public class PunchData {
 	private Integer shift;
 	
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	
 	private Date date;
+	
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	private Date startDate;
+	
+	
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	private Date endDate;
+	
 
 	private Duration totalLunchHours;
 	
@@ -59,11 +68,30 @@ public class PunchData {
 		this.totalWorkHours = totalWorkHours;
 	}
 
+	public Date getStartDate() {
+		return startDate;
+	}
+
+	public void setStartDate(Date startDate) {
+		this.startDate = startDate;
+	}
+
+	public Date getEndDate() {
+		return endDate;
+	}
+
+	public void setEndDate(Date endDate) {
+		this.endDate = endDate;
+	}
+
 	@Override
 	public String toString() {
-		return "PunchData [emp=" + emp + ", shift=" + shift + ", date=" + date + ", totalLunchHours=" + totalLunchHours
-				+ ", totalWorkHours=" + totalWorkHours + "]";
+		return "PunchData [emp=" + emp + ", shift=" + shift + ", date=" + date + ", startDate=" + startDate
+				+ ", endDate=" + endDate + ", totalLunchHours=" + totalLunchHours + ", totalWorkHours=" + totalWorkHours
+				+ "]";
 	}
+
+
 
 
 	

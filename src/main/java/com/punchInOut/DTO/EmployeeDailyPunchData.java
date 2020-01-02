@@ -1,6 +1,5 @@
 package com.punchInOut.DTO;
 
-import java.time.Duration;
 import java.util.Date;
 
 import javax.persistence.CascadeType;
@@ -31,12 +30,7 @@ public class EmployeeDailyPunchData {
     
     @Column(name = "punch_count")
     private Integer punchCount;
-	
-    @Column(name = "total_work_hours")
-    private Duration totalWorkHours;
-    
-    @Column(name = "total_lunch_hours")
-    private Duration totalLunchHours;
+
     
     @Temporal(TemporalType.DATE)
     @Column(name = "punch_day")
@@ -66,18 +60,7 @@ public class EmployeeDailyPunchData {
 	}
 
 
-	public Duration getTotalWorkHours() {
-		return totalWorkHours;
-	}
-	public void setTotalWorkHours(Duration totalWorkHours) {
-		this.totalWorkHours = totalWorkHours;
-	}
-	public Duration getTotalLunchHours() {
-		return totalLunchHours;
-	}
-	public void setTotalLunchHours(Duration totalLunchHours) {
-		this.totalLunchHours = totalLunchHours;
-	}
+
 	public Integer getPunchCount() {
 		return punchCount;
 	}
