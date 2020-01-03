@@ -92,7 +92,6 @@ public class PunchInOutService {
 		 PunchData totalPunchData= new PunchData();
 		 totalPunchData.setEmp(punchData.getEmp());
 			List<PunchClockData> punchClockData = punchClockDataRepository.findByEmpIdAndPunchDayAndShift(punchData.getEmp(),punchData.getDate(),punchData.getShift());
-
 		 
 		 if(punchClockData.size()!=0) {
 		 if(punchClockData.size()>1) {
@@ -174,9 +173,10 @@ public class PunchInOutService {
 		SimpleDateFormat simpleDateformat = new SimpleDateFormat("E");
 		WorkHours workhoursSecondShift = workHoursRepository.findByEmpIdAndDayAndShift(emp, simpleDateformat.format(new Date()),
 				2);
+		WorkHours workhours = workHoursRepository.findByEmpIdAndDayAndShift(emp,
+				simpleDateformat.format(new Date()), 1);
 		if (workhoursSecondShift.getTime().isEmpty()) {
-			WorkHours workhours = workHoursRepository.findByEmpIdAndDayAndShift(emp,
-					simpleDateformat.format(new Date()), 1);
+		
 			if (workhours.getTime().isEmpty()) {
 				return 0;
 			} else {
@@ -189,9 +189,10 @@ public class PunchInOutService {
 				if (LocalTime.now().isAfter(LocalTime.parse(time[0]))) {
 					return 2;
 				} else {
-					return 1;
+					return 0;
 				}
-			}
+			
+				}
 			return 0;
 		}
 	}
