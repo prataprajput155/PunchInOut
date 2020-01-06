@@ -4,6 +4,8 @@ package com.punchInOut.controller;
 
 
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,4 +39,16 @@ public class PunchInOutController {
 	@GetMapping("/get-hours")
 	public PunchData gethours(PunchData punchData) {
 		return punchInOutService.getHoursOfShiftAndDay(punchData);}
+	@GetMapping("/get-employee-schedule-behaviour")
+	public List<PunchData> getEmployeeScheduleBehaviour(PunchData punchData){
+		return punchInOutService.getEmployeeScheduleBehaviour(punchData);
+	}
+	
+	
+	@GetMapping("/get-daterange-schedule-behaviour")
+	public List<PunchData> getDateRangeScheduleBehaviourOfAll(PunchData punchData)
+	{
+		return punchInOutService.getDateRangeScheduleBehaviour(punchData);
+		
+	}
 }

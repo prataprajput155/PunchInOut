@@ -12,7 +12,6 @@ public class PunchData {
 	private Integer shift;
 	
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
-	
 	private Date date;
 	
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
@@ -22,7 +21,12 @@ public class PunchData {
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private Date endDate;
 	
-
+	private String startTime;
+	private String endTime;
+	
+	private Integer lateCount;
+	private Integer earlyCount;
+	private Integer ontimeCount;
 	private Duration totalLunchHours;
 	
 	private Duration totalWorkHours;
@@ -84,12 +88,59 @@ public class PunchData {
 		this.endDate = endDate;
 	}
 
+
+
+	public String getStartTime() {
+		return startTime;
+	}
+
+	public void setStartTime(String startTime) {
+		this.startTime = startTime;
+	}
+
+	public String getEndTime() {
+		return endTime;
+	}
+
+	public void setEndTime(String endTime) {
+		this.endTime = endTime;
+	}
+
+	
+	
+	public Integer getLateCount() {
+		return lateCount;
+	}
+
+	public void setLateCount(Integer lateCount) {
+		this.lateCount = lateCount;
+	}
+
+	public Integer getEarlyCount() {
+		return earlyCount;
+	}
+
+	public void setEarlyCount(Integer earlyCount) {
+		this.earlyCount = earlyCount;
+	}
+
+	public Integer getOntimeCount() {
+		return ontimeCount;
+	}
+
+	public void setOntimeCount(Integer ontimeCount) {
+		this.ontimeCount = ontimeCount;
+	}
+
 	@Override
 	public String toString() {
 		return "PunchData [emp=" + emp + ", shift=" + shift + ", date=" + date + ", startDate=" + startDate
-				+ ", endDate=" + endDate + ", totalLunchHours=" + totalLunchHours + ", totalWorkHours=" + totalWorkHours
-				+ "]";
+				+ ", endDate=" + endDate + ", startTime=" + startTime + ", endTime=" + endTime + ", lateCount="
+				+ lateCount + ", earlyCount=" + earlyCount + ", ontimeCount=" + ontimeCount + ", totalLunchHours="
+				+ totalLunchHours + ", totalWorkHours=" + totalWorkHours + "]";
 	}
+
+	
 
 
 
